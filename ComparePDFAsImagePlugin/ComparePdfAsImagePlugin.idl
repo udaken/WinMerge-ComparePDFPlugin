@@ -1,0 +1,58 @@
+// ComparePdfAsImagePlugin.idl : IDL source for ComparePdfAsImagePlugin.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ComparePdfAsImagePlugin.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+[
+	object,
+	uuid(BEF6FF02-A512-485E-8D39-7038911B1179),
+	dual,
+	helpstring("IWinMergeScript Interface"),
+	pointer_default(unique)
+]
+interface IWinMergeScript : IDispatch
+{
+	[propget, id(1), helpstring("property PluginEvent")] HRESULT PluginEvent([out, retval] BSTR* pVal);
+	[propget, id(2), helpstring("property PluginDescription")] HRESULT PluginDescription([out, retval] BSTR* pVal);
+	[propget, id(3), helpstring("property PluginFileFilters")] HRESULT PluginFileFilters([out, retval] BSTR* pVal);
+	[propget, id(4), helpstring("property PluginIsAutomatic")] HRESULT PluginIsAutomatic([out, retval] VARIANT_BOOL* pVal);
+	[propget, id(98), helpstring("property PluginExtendedProperties")] HRESULT PluginExtendedProperties([out, retval] BSTR* pVal);
+	// PREDIFFING
+	//[id(5), helpstring("method PrediffBufferW")] HRESULT PrediffBufferW([in] BSTR* pText, [in] INT* pSize, [in] VARIANT_BOOL* pbChanged, [out, retval] VARIANT_BOOL* pbHandled);
+	// BUFFER_PACK_UNPACK
+	//[id(6), helpstring("method UnpackBufferA")] HRESULT UnpackBufferA([in] SAFEARRAY(unsigned char)* pBuffer, [in] INT* pSize, [in] VARIANT_BOOL* pbChanged, [in] INT* pSubcode, [out, retval] VARIANT_BOOL* pbSuccess);
+	//[id(7), helpstring("method PackBufferA")] HRESULT PackBufferA([in] SAFEARRAY(unsigned char)* pBuffer, [in] INT* pSize, [in] VARIANT_BOOL* pbChanged, [in] INT subcode, [out, retval] VARIANT_BOOL* pbSuccess);
+	// FILE_PACK_UNPACK
+	//[id(8), helpstring("method UnpackFile")] HRESULT UnpackFile([in] BSTR fileSrc, [in] BSTR fileDst, VARIANT_BOOL * pbChanged, INT * pSubcode, [out, retval] VARIANT_BOOL * pbSuccess);
+	//[id(9), helpstring("method PackFile")] HRESULT PackFile([in] BSTR fileSrc, [in] BSTR fileDst, VARIANT_BOOL * pbChanged, INT pSubcode, [out, retval] VARIANT_BOOL * pbSuccess);
+	// FILE_FOLDER_PACK_UNPACK
+	[id(11), helpstring("method IsFolder")] HRESULT IsFolder([in] BSTR file, [out, retval] VARIANT_BOOL* pbSuccess);
+	[id(12), helpstring("method UnpackFolder")] HRESULT UnpackFolder([in] BSTR fileSrc, [in] BSTR folderDst, VARIANT_BOOL* pbChanged, INT* pSubcode, [out, retval] VARIANT_BOOL* pbSuccess);
+	[id(13), helpstring("method PackFolder")] HRESULT PackFolder([in] BSTR fileSrc, [in] BSTR fileDst, VARIANT_BOOL* pbChanged, INT pSubcode, [out, retval] VARIANT_BOOL* pbSuccess);
+
+	[id(100), helpstring("method ShowSettingsDialog")] HRESULT ShowSettingsDialog([out, retval] VARIANT_BOOL* pbHandled);
+
+}; 
+
+[
+	uuid(D98C4292-98BC-449E-AE26-50365F83FE77),
+	version(1.0),
+	helpstring("ComparePdfAsImagePlugin 1.0 Type Library")
+]
+library ComparePdfAsImagePlugin
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(59562610-CE1C-4011-BC33-BCAFFD4105A3),
+		helpstring("WinMergeScript Class")
+	]
+	coclass WinMergeScript
+	{
+		[default] interface IWinMergeScript;
+	};
+};
