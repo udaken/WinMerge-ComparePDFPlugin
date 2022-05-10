@@ -39,7 +39,6 @@ extern CComModule _Module;
 #include "winrt/Windows.Foundation.h"
 #include "winrt/Windows.Data.Pdf.h"
 #include "winrt/Windows.Storage.Streams.h"
-#include "winrt/Windows.Storage.h"
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

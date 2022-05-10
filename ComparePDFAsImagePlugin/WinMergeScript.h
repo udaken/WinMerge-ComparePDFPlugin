@@ -62,7 +62,26 @@ class ATL_NO_VTABLE CWinMergeScript
 
     IFACEMETHODIMP get_PluginExtendedProperties(/* [retval][out] */ BSTR *pVal) override
     {
-        *pVal = SysAllocString(L"ProcessType=Content Extraction;FileType=PDF/CBZ/CBR/CB7;MenuCaption=PDF/CBZ/CBR/CB7");
+        *pVal = SysAllocString(L"ProcessType=Content Extraction;FileType=PDF;MenuCaption=PDF");
+        return S_OK;
+    }
+
+    IFACEMETHODIMP UnpackFile(
+        /* [in] */ BSTR fileSrc,
+        /* [in] */ BSTR fileDst, VARIANT_BOOL *pbChanged, INT *pSubcode,
+        /* [retval][out] */ VARIANT_BOOL *pbSuccess) override
+    {
+        *pbSuccess = VARIANT_FALSE;
+        return S_OK;    
+    }
+
+
+    IFACEMETHODIMP PackFile(
+        /* [in] */ BSTR fileSrc,
+        /* [in] */ BSTR fileDst, VARIANT_BOOL *pbChanged, INT pSubcode,
+        /* [retval][out] */ VARIANT_BOOL *pbSuccess) override
+    {
+        *pbSuccess = VARIANT_FALSE;
         return S_OK;
     }
 

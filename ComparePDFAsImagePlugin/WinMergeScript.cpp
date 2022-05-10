@@ -16,8 +16,8 @@ static winrt::Windows::Foundation::IAsyncAction PdfRenderAsync(LPCWSTR path, FLO
     using namespace winrt::Windows::Storage;
     using namespace winrt::Windows::Data::Pdf;
     using namespace winrt::Windows::Storage::Streams;
-    winrt::apartment_context ui_thread;
-    // co_await winrt::resume_background(); // Return control; resume on thread pool.
+    // winrt::apartment_context ui_thread;
+    co_await winrt::resume_background(); // Return control; resume on thread pool.
 
     auto stream{co_await FileRandomAccessStream::OpenAsync(path, FileAccessMode::Read)};
 
@@ -27,7 +27,7 @@ static winrt::Windows::Foundation::IAsyncAction PdfRenderAsync(LPCWSTR path, FLO
     for (UINT pageIndex = 0; pageIndex < pageCount; pageIndex++)
     {
         WCHAR dest[MAX_PATH]{};
-        swprintf_s(dest, L"%s\\page_%u.png", destFolder, pageIndex);
+        swprintf_s(dest, L"%s\\page_%03u.png", destFolder, pageIndex);
 
         auto destFile{co_await FileRandomAccessStream::OpenAsync(
             dest, FileAccessMode::ReadWrite, StorageOpenOptions::None, FileOpenDisposition::CreateNew)};
@@ -35,15 +35,20 @@ static winrt::Windows::Foundation::IAsyncAction PdfRenderAsync(LPCWSTR path, FLO
         auto page{doc.GetPage(pageIndex)};
         auto size{page.Size()};
         PdfPageRenderOptions renderOptions{};
-        renderOptions.BitmapEncoderId(GUID_ContainerFormatPng);
+        renderOptions.BitmapEncoderId(CLSID_WICPngEncoder);
         renderOptions.DestinationWidth(static_cast<UINT>(size.Width * scale));
         renderOptions.DestinationHeight(static_cast<UINT>(size.Height * scale));
 
         co_await page.RenderToStreamAsync(destFile, renderOptions);
         co_await destFile.FlushAsync();
         destFile.Close();
+        destFile = {};
+        page.Close();
     }
-     co_await ui_thread; // Switch back to calling context.
+
+    stream.Close();
+
+    // co_await ui_thread; // Switch back to calling context.
 }
 
 IFACEMETHODIMP CWinMergeScript::get_PluginEvent(/*[out, retval]*/ BSTR *pVal)
@@ -63,17 +68,24 @@ IFACEMETHODIMP CWinMergeScript::UnpackFolder(
     *pbSuccess = VARIANT_FALSE;
     auto config = Config::Load();
 
+    using namespace winrt;
+    using namespace winrt::Windows::Foundation;
+
+    handle event{check_pointer(WINRT_IMPL_CreateEventW(nullptr, true, false, nullptr))};
+
     try
     {
-        PdfRenderAsync(fileSrc, config->scale(), folderDst).get(); // wait for complete;
-    }
-    catch (const winrt::hresult_error &hr)
-    {
-        return hr.code();
+        auto async{PdfRenderAsync(fileSrc, config->scale(), folderDst)};
+        async.Completed([&](auto &&, auto &&) { WINRT_VERIFY(WINRT_IMPL_SetEvent(event.get())); });
+        WINRT_IMPL_WaitForSingleObject(event.get(), INFINITE); // wait for complete;
+        if (async.Status() == AsyncStatus::Error)
+        {
+            return async.ErrorCode();
+        }
     }
     catch (...)
     {
-        return E_FAIL;
+        return to_hresult();
     }
 
     *pbChanged = VARIANT_TRUE;
